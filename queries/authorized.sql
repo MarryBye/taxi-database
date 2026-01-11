@@ -105,7 +105,7 @@ BEGIN
     RETURNING id INTO order_id;
 
     INSERT INTO private.routes(order_id, start_location, end_location, distance)
-    VALUES (order_id, p_addresses[1], p_addresses[array_length(p_addresses, 1)], 0)
+    VALUES (order_id, p_addresses[1], p_addresses[array_length(p_addresses, 1)], random() * (50 - 3) + 3)
     RETURNING id INTO route_id;
 
     FOREACH ad IN ARRAY p_addresses LOOP
@@ -147,6 +147,37 @@ BEGIN
         WHERE (orders.client->>'id')::BIGINT = user_id AND NOT orders.status IN ('completed', 'canceled');
 END;
 $$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION authorized.get_client_order(
+    p_order_id BIGINT
+)
+    RETURNS admin.orders_view
+    SECURITY DEFINER
+    SET search_path = private, admin, authorized, public
+AS $$
+DECLARE
+    v_user_id BIGINT := public.get_current_user_from_session();
+    v_order admin.orders_view;
+BEGIN
+    IF v_user_id IS NULL THEN
+        RAISE EXCEPTION 'User not found';
+    END IF;
+
+    SELECT o.*
+    INTO v_order
+    FROM admin.orders_view o
+    WHERE
+        o.id = p_order_id
+      AND (o.client->>'id')::BIGINT = v_user_id;
+
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'Access denied or order not found';
+    END IF;
+
+    RETURN v_order;
+END;
+$$ LANGUAGE plpgsql;
+
 
 CREATE OR REPLACE FUNCTION authorized.order_stat(
     p_order_id BIGINT

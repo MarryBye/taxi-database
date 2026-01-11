@@ -19,15 +19,25 @@ $$ LANGUAGE plpgsql;
 
 
 CREATE OR REPLACE FUNCTION workers.acceptable_orders()
-RETURNS SETOF admin.orders_view
-SECURITY DEFINER
-SET search_path = private, admin, workers, public
+    RETURNS SETOF admin.orders_view
+    SECURITY DEFINER
+    SET search_path = private, admin, workers, public
 AS $$
 DECLARE
     v_user_id BIGINT := public.get_current_user_from_session();
+    v_city_id BIGINT;
 BEGIN
     IF v_user_id IS NULL THEN
         RAISE EXCEPTION 'User not found';
+    END IF;
+
+    SELECT u.city_id
+    INTO v_city_id
+    FROM private.users u
+    WHERE u.id = v_user_id;
+
+    IF v_city_id IS NULL THEN
+        RAISE EXCEPTION 'Driver city not found';
     END IF;
 
     RETURN QUERY
@@ -35,27 +45,58 @@ BEGIN
         FROM admin.orders_view o
         WHERE
             o.driver IS NULL
-            AND o.status = 'searching_for_driver'
-            AND o.order_class = (
-                SELECT c.car_class FROM private.cars c WHERE c.driver_id = v_user_id
-            )
-            AND (o.client->'city'->>'id')::BIGINT = (
-                SELECT u.city_id FROM private.users u WHERE u.id = v_user_id
-            );
+          AND o.status = 'searching_for_driver'
+          AND (o.client->'city'->>'id')::BIGINT = v_city_id;
 END;
 $$ LANGUAGE plpgsql;
 
-SELECT o.*
-        FROM admin.orders_view o
-        WHERE
+CREATE OR REPLACE FUNCTION workers.get_driver_order(
+    p_order_id BIGINT
+)
+    RETURNS admin.orders_view
+    SECURITY DEFINER
+    SET search_path = private, admin, workers, public
+AS $$
+DECLARE
+    v_user_id BIGINT := public.get_current_user_from_session();
+    v_city_id BIGINT;
+    v_order admin.orders_view;
+BEGIN
+    IF v_user_id IS NULL THEN
+        RAISE EXCEPTION 'User not found';
+    END IF;
+
+    SELECT u.city_id
+    INTO v_city_id
+    FROM private.users u
+    WHERE u.id = v_user_id;
+
+    IF v_city_id IS NULL THEN
+        RAISE EXCEPTION 'Driver city not found';
+    END IF;
+
+    SELECT o.*
+    INTO v_order
+    FROM admin.orders_view o
+    WHERE
+        o.id = p_order_id
+      AND (
+        (o.driver IS NOT NULL AND (o.driver->>'id')::BIGINT = v_user_id) OR
+        (
             o.driver IS NULL
-            AND o.status = 'searching_for_driver'
-            AND o.order_class = (
-                SELECT c.car_class FROM private.cars c WHERE c.driver_id = 9
+                AND o.status = 'searching_for_driver'
+                AND (o.client->'city'->>'id')::BIGINT = v_city_id
             )
-            AND (o.client->'city'->>'id')::BIGINT = (
-                SELECT u.city_id FROM private.users u WHERE u.id = 9
-            );
+        );
+
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'Access denied or order not found';
+    END IF;
+
+    RETURN v_order;
+END;
+$$ LANGUAGE plpgsql;
+
 
 CREATE OR REPLACE FUNCTION workers.accept_order(
     p_order_id BIGINT

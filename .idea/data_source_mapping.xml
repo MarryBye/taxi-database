@@ -3,7 +3,18 @@
   <component name="DataSourcePerFileMappings">
     <file url="file://$APPLICATION_CONFIG_DIR$/consoles/db/eef27060-e850-4757-aef0-14fc467a468f/console.sql" value="eef27060-e850-4757-aef0-14fc467a468f" />
     <file url="file://$APPLICATION_CONFIG_DIR$/consoles/db/eef27060-e850-4757-aef0-14fc467a468f/console_1.sql" value="eef27060-e850-4757-aef0-14fc467a468f" />
+    <file url="file://$PROJECT_DIR$/check_functions.sql" value="eef27060-e850-4757-aef0-14fc467a468f" />
+    <file url="file://$PROJECT_DIR$/create_roles.sql" value="eef27060-e850-4757-aef0-14fc467a468f" />
     <file url="file://$PROJECT_DIR$/main_views.sql" value="eef27060-e850-4757-aef0-14fc467a468f" />
     <file url="file://$PROJECT_DIR$/queries/admin.sql" value="eef27060-e850-4757-aef0-14fc467a468f" />
+    <file url="file://$PROJECT_DIR$/queries/auth.sql" value="eef27060-e850-4757-aef0-14fc467a468f" />
+    <file url="file://$PROJECT_DIR$/queries/authorized.sql" value="eef27060-e850-4757-aef0-14fc467a468f" />
+    <file url="file://$PROJECT_DIR$/queries/public.sql" value="eef27060-e850-4757-aef0-14fc467a468f" />
+    <file url="file://$PROJECT_DIR$/queries/worker.sql" value="eef27060-e850-4757-aef0-14fc467a468f" />
+    <file url="file://$PROJECT_DIR$/tables.sql" value="eef27060-e850-4757-aef0-14fc467a468f" />
+    <file url="file://$PROJECT_DIR$/tests.sql" value="4b8fa41b-af7b-4a18-ab44-d9591b87264f" />
+    <file url="file://$PROJECT_DIR$/triggers/update_changet_at.sql" value="eef27060-e850-4757-aef0-14fc467a468f" />
+    <file url="file://$PROJECT_DIR$/triggers/update_user_balance.sql" value="eef27060-e850-4757-aef0-14fc467a468f" />
+    <file url="file://$PROJECT_DIR$/types.sql" value="eef27060-e850-4757-aef0-14fc467a468f" />
   </component>
 </project>

@@ -82,6 +82,3 @@ BEGIN
     RETURN user_id;
 END;
 $$ LANGUAGE plpgsql;
-
-SELECT * FROM register('MarryBye', 'Ukraine555U', 'Viktor', 'Lukianov', 'vlukianov04@gmail.com', '+380660734348', 1);
-SELECT * FROM authenticate('MarryBye', 'Ukraine555U');

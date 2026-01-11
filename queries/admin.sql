@@ -130,15 +130,11 @@ CREATE OR REPLACE FUNCTION admin.update_user(
     p_email VARCHAR(64) DEFAULT NULL,
     p_tel_number VARCHAR(16) DEFAULT NULL,
     p_city_id BIGINT DEFAULT NULL,
-    p_password VARCHAR(64) DEFAULT NULL,
     p_role public.user_roles DEFAULT NULL
 ) RETURNS SETOF admin.users_view SECURITY DEFINER AS $$
 DECLARE
     user_login VARCHAR(32);
 BEGIN
-    IF (NOT p_password IS NULL) AND (NOT public.check_password(p_password)) THEN
-        RAISE EXCEPTION 'Invalid password';
-    END IF;
 
     SELECT users.login INTO user_login FROM private.users AS users WHERE users.id = p_user_id;
 
@@ -149,15 +145,11 @@ BEGIN
         email        = COALESCE(p_email,      users.email),
         tel_number   = COALESCE(p_tel_number, users.tel_number),
         city_id      = COALESCE(p_city_id,    users.city_id),
-        role         = COALESCE(p_role,         users.role),
-        password_hash = CASE
-            WHEN p_password IS NULL THEN users.password_hash
-            ELSE crypto.crypt(p_password, crypto.gen_salt('bf', 12))
-        END
+        role         = COALESCE(p_role,         users.role)
     WHERE users.id = p_user_id;
 
-    IF (p_password IS NOT NULL) THEN
-        CALL admin.change_psql_user_password(user_login, p_password);
+    IF p_role IS NOT NULL THEN
+        CALL admin.set_psql_user_role(user_login, p_role);
     END IF;
 
     RETURN QUERY
@@ -196,6 +188,14 @@ CREATE OR REPLACE FUNCTION admin.create_car(
 DECLARE
     created_car_id BIGINT;
 BEGIN
+
+    IF (p_driver_id IS NOT NULL AND NOT (
+        SELECT EXISTS(
+            SELECT 1 FROM admin.users_view AS users WHERE users.id = p_driver_id AND users.role = 'driver'
+        )
+    )) THEN
+        RAISE EXCEPTION 'Invalid driver!';
+    END IF;
 
     INSERT INTO private.cars (mark, model, number_plate, city_id, color, car_class, car_status, driver_id)
     VALUES (p_mark, p_model, p_number_plate, p_city_id, p_color, p_car_class, p_car_status, p_driver_id)
@@ -243,6 +243,15 @@ CREATE OR REPLACE FUNCTION admin.update_car(
     p_driver_id BIGINT DEFAULT NULL
 ) RETURNS SETOF admin.cars_view SECURITY DEFINER AS $$
 BEGIN
+
+    IF (p_driver_id IS NOT NULL AND NOT (
+        SELECT EXISTS(
+            SELECT 1 FROM admin.users_view AS users WHERE users.id = p_driver_id AND users.role = 'driver'
+        )
+    )) THEN
+        RAISE EXCEPTION 'Invalid driver!';
+    END IF;
+
     UPDATE private.cars SET
         mark         = COALESCE(p_mark, mark),
         model        = COALESCE(p_model, model),
@@ -372,14 +381,3 @@ BEGIN
     RETURN QUERY SELECT * FROM admin.transactions_view WHERE id = p_transaction_id;
 END;
 $$ LANGUAGE plpgsql;
-
-SELECT * FROM admin.update_user(
-10,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              'admin'
-)

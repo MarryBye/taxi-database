@@ -40,14 +40,28 @@ SELECT
     AVG(routes.distance) AS average_distance,
     MAX(routes.distance) AS max_distance,
     AVG(order_ratings.mark) AS client_rating,
-    ARRAY_AGG(order_client_tags.tag)
-        FILTER (WHERE order_client_tags.tag IS NOT NULL)
-        AS all_tags
+    (
+        SELECT json_agg(
+            json_build_object(
+                'tag', tag,
+                'count', cnt
+            )
+        )
+        FROM (
+            SELECT
+                order_client_tags.tag::text AS tag,
+                COUNT(*) AS cnt
+            FROM private.orders o2
+                JOIN private.order_client_tags
+                ON order_client_tags.order_id = o2.id
+            WHERE o2.client_id = users.id
+            GROUP BY order_client_tags.tag
+        ) t
+    ) AS all_tags
 FROM private.users AS users
 LEFT JOIN private.orders AS orders ON orders.client_id = users.id
 LEFT JOIN private.routes AS routes ON routes.order_id = orders.id
 LEFT JOIN private.order_ratings AS order_ratings ON order_ratings.order_id = orders.id AND order_ratings.mark_by != orders.client_id
-LEFT JOIN private.order_client_tags AS order_client_tags ON order_client_tags.order_id = orders.id
 GROUP BY users.id;
 
 CREATE OR REPLACE VIEW admin.drivers_stat_view AS
@@ -76,17 +90,31 @@ SELECT
     AVG(routes.distance) AS average_distance,
     MAX(routes.distance) AS max_distance,
     AVG(order_ratings.mark) AS driver_rating,
-    ARRAY_AGG(order_driver_tags.tag)
-        FILTER (WHERE order_driver_tags.tag IS NOT NULL)
-        AS all_tags
+    (
+        SELECT json_agg(
+                       json_build_object(
+                               'tag', tag,
+                               'count', cnt
+                       )
+               )
+        FROM (
+                 SELECT
+                     order_driver_tags.tag::text AS tag,
+                     COUNT(*) AS cnt
+                 FROM private.orders o2
+                          JOIN private.order_driver_tags
+                               ON order_driver_tags.order_id = o2.id
+                 WHERE o2.driver_id = users.id
+                 GROUP BY order_driver_tags.tag
+             ) t
+    ) AS all_tags
 FROM private.users AS users
 LEFT JOIN private.cars AS cars ON cars.driver_id = users.id
 LEFT JOIN private.orders AS orders ON orders.driver_id = users.id
 LEFT JOIN private.routes AS routes ON routes.order_id = orders.id
 LEFT JOIN private.order_ratings AS order_ratings ON order_ratings.order_id = orders.id AND order_ratings.mark_by != orders.driver_id
-LEFT JOIN private.order_driver_tags AS order_driver_tags ON order_driver_tags.order_id = orders.id
 WHERE users.role = 'driver'
-GROUP BY users.id, cars.id;
+GROUP BY  users.id, cars.id;
 
 CREATE OR REPLACE VIEW admin.cars_view AS
 SELECT

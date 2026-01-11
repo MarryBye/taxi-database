@@ -1,17 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="SqlDialectMappings">
-    <file url="file://$PROJECT_DIR$/check_functions.sql" dialect="GenericSQL" />
-    <file url="file://$PROJECT_DIR$/create_roles.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/check_functions.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/create_roles.sql" dialect="PostgreSQL" />
     <file url="file://$PROJECT_DIR$/main_views.sql" dialect="PostgreSQL" />
     <file url="file://$PROJECT_DIR$/queries/admin.sql" dialect="PostgreSQL" />
-    <file url="file://$PROJECT_DIR$/queries/auth.sql" dialect="GenericSQL" />
-    <file url="file://$PROJECT_DIR$/queries/authorized.sql" dialect="GenericSQL" />
-    <file url="file://$PROJECT_DIR$/queries/public.sql" dialect="GenericSQL" />
-    <file url="file://$PROJECT_DIR$/queries/worker.sql" dialect="GenericSQL" />
-    <file url="file://$PROJECT_DIR$/tests.sql" dialect="GenericSQL" />
-    <file url="file://$PROJECT_DIR$/triggers/update_changet_at.sql" dialect="GenericSQL" />
-    <file url="file://$PROJECT_DIR$/triggers/update_user_balance.sql" dialect="GenericSQL" />
-    <file url="file://$PROJECT_DIR$/types.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/queries/auth.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/queries/authorized.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/queries/public.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/queries/worker.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/tables.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/tests.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/triggers/update_changet_at.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/triggers/update_user_balance.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/types.sql" dialect="PostgreSQL" />
   </component>
 </project>
