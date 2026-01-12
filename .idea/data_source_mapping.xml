@@ -12,7 +12,7 @@
     <file url="file://$PROJECT_DIR$/queries/public.sql" value="eef27060-e850-4757-aef0-14fc467a468f" />
     <file url="file://$PROJECT_DIR$/queries/worker.sql" value="eef27060-e850-4757-aef0-14fc467a468f" />
     <file url="file://$PROJECT_DIR$/tables.sql" value="eef27060-e850-4757-aef0-14fc467a468f" />
-    <file url="file://$PROJECT_DIR$/tests.sql" value="4b8fa41b-af7b-4a18-ab44-d9591b87264f" />
+    <file url="file://$PROJECT_DIR$/tests.sql" value="eef27060-e850-4757-aef0-14fc467a468f" />
     <file url="file://$PROJECT_DIR$/triggers/update_changet_at.sql" value="eef27060-e850-4757-aef0-14fc467a468f" />
     <file url="file://$PROJECT_DIR$/triggers/update_user_balance.sql" value="eef27060-e850-4757-aef0-14fc467a468f" />
     <file url="file://$PROJECT_DIR$/triggers/user_triggers.sql" value="eef27060-e850-4757-aef0-14fc467a468f" />

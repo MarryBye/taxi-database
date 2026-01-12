@@ -62,9 +62,7 @@ CREATE TABLE IF NOT EXISTS private.orders (
     finished_at TIMESTAMP,
 
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-    changed_at TIMESTAMP NOT NULL DEFAULT NOW(),
-
-    UNIQUE(client_id, driver_id)
+    changed_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
 CREATE TABLE IF NOT EXISTS private.order_ratings (

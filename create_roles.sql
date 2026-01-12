@@ -28,11 +28,13 @@ REVOKE ALL ON SCHEMA "authorized" FROM PUBLIC;
 REVOKE ALL ON SCHEMA "workers" FROM PUBLIC;
 REVOKE ALL ON SCHEMA "crypto" FROM PUBLIC;
 REVOKE ALL ON SCHEMA "analytics" FROM PUBLIC;
+REVOKE ALL ON SCHEMA "public" FROM PUBLIC;
 
 GRANT USAGE ON SCHEMA "admin"       TO "admin";
 GRANT USAGE ON SCHEMA "authorized"  TO "admin", "client", "driver";
 GRANT USAGE ON SCHEMA "workers"     TO "admin", "driver";
 GRANT USAGE ON SCHEMA "analytics"   TO "admin", "client", "driver";
+GRANT USAGE ON SCHEMA "public"   TO "admin", "client", "driver", "guest";
 
 GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA "admin" TO "admin";
 GRANT EXECUTE ON ALL PROCEDURES IN SCHEMA "admin" TO "admin";
@@ -40,6 +42,8 @@ GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA "authorized" TO "admin", "client", "dri
 GRANT EXECUTE ON ALL PROCEDURES IN SCHEMA "authorized" TO "admin", "client", "driver";
 GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA "workers" TO "admin", "driver";
 GRANT EXECUTE ON ALL PROCEDURES IN SCHEMA "workers" TO "admin", "driver";
+GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA "public" TO "admin", "client", "driver", "guest";
+GRANT EXECUTE ON ALL PROCEDURES IN SCHEMA "public" TO "admin", "client", "driver", "guest";
 
 -- Технический пользователь
 

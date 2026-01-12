@@ -204,7 +204,7 @@ BEGIN
         FROM admin.orders_view
         WHERE
             (driver->>'id')::BIGINT = user_id
-            AND status NOT IN ('completed', 'canceled');
+            AND status NOT IN ('waiting_for_marks', 'completed', 'canceled');
 END;
 $$ LANGUAGE plpgsql;
 

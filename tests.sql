@@ -131,7 +131,3 @@ END;
 $$ LANGUAGE plpgsql;
 
 CALL private.register_test_cars();
-
-SELECT * FROM workers.acceptable_orders();
-
-SELECT * FROM workers.submit_finish()

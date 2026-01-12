@@ -137,7 +137,7 @@ BEGIN
 
     RETURN QUERY
         SELECT * FROM admin.orders_view AS orders
-        WHERE (orders.client->>'id')::BIGINT = user_id AND NOT orders.status IN ('completed', 'canceled');
+        WHERE (orders.client->>'id')::BIGINT = user_id AND NOT orders.status IN ('waiting_for_marks', 'completed', 'canceled');
 END;
 $$ LANGUAGE plpgsql;
 
