@@ -13,6 +13,7 @@
     <file url="file://$PROJECT_DIR$/tests.sql" dialect="PostgreSQL" />
     <file url="file://$PROJECT_DIR$/triggers/update_changet_at.sql" dialect="PostgreSQL" />
     <file url="file://$PROJECT_DIR$/triggers/update_user_balance.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/triggers/user_triggers.sql" dialect="PostgreSQL" />
     <file url="file://$PROJECT_DIR$/types.sql" dialect="PostgreSQL" />
   </component>
 </project>

@@ -57,14 +57,7 @@ CREATE OR REPLACE FUNCTION admin.create_user(
 ) RETURNS SETOF admin.users_view SECURITY DEFINER AS $$
 DECLARE
     created_user_id BIGINT;
-    hashed_password VARCHAR(512);
 BEGIN
-    IF (NOT public.check_password(p_password)) THEN
-        RAISE EXCEPTION 'Password must contain at least 8 characters!';
-    END IF;
-
-    hashed_password := crypto.crypt(p_password, crypto.gen_salt('bf', 12));
-
     INSERT INTO private.users (
          login,
          password_hash,
@@ -77,7 +70,7 @@ BEGIN
     )
     VALUES (
         p_login,
-        hashed_password,
+        p_password,
         p_first_name,
         p_last_name,
         p_email,
@@ -188,15 +181,6 @@ CREATE OR REPLACE FUNCTION admin.create_car(
 DECLARE
     created_car_id BIGINT;
 BEGIN
-
-    IF (p_driver_id IS NOT NULL AND NOT (
-        SELECT EXISTS(
-            SELECT 1 FROM admin.users_view AS users WHERE users.id = p_driver_id AND users.role = 'driver'
-        )
-    )) THEN
-        RAISE EXCEPTION 'Invalid driver!';
-    END IF;
-
     INSERT INTO private.cars (mark, model, number_plate, city_id, color, car_class, car_status, driver_id)
     VALUES (p_mark, p_model, p_number_plate, p_city_id, p_color, p_car_class, p_car_status, p_driver_id)
     RETURNING id INTO created_car_id;
@@ -243,15 +227,6 @@ CREATE OR REPLACE FUNCTION admin.update_car(
     p_driver_id BIGINT DEFAULT NULL
 ) RETURNS SETOF admin.cars_view SECURITY DEFINER AS $$
 BEGIN
-
-    IF (p_driver_id IS NOT NULL AND NOT (
-        SELECT EXISTS(
-            SELECT 1 FROM admin.users_view AS users WHERE users.id = p_driver_id AND users.role = 'driver'
-        )
-    )) THEN
-        RAISE EXCEPTION 'Invalid driver!';
-    END IF;
-
     UPDATE private.cars SET
         mark         = COALESCE(p_mark, mark),
         model        = COALESCE(p_model, model),

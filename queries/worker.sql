@@ -340,3 +340,21 @@ BEGIN
         WHERE id = user_id;
 END;
 $$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION workers.withdraw_cash(
+    p_amount NUMERIC
+)
+    RETURNS VOID SECURITY DEFINER AS $$
+DECLARE
+    user_id BIGINT := public.get_current_user_from_session();
+BEGIN
+    IF user_id IS NULL THEN
+        RAISE EXCEPTION 'User not found';
+    END IF;
+
+    INSERT INTO private.transactions AS transactions
+        (user_id, balance_type, transaction_type, payment_method, amount)
+    VALUES
+        (user_id, 'earning', 'credit', 'credit_card', p_amount);
+END;
+$$ LANGUAGE plpgsql;

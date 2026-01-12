@@ -26,10 +26,6 @@ BEGIN
         RAISE EXCEPTION 'User not found';
     END IF;
 
-    IF (NOT p_password IS NULL) AND (NOT public.check_password(p_password)) THEN
-        RAISE EXCEPTION 'Invalid password';
-    END IF;
-
     UPDATE private.users AS users
         SET
         first_name   = COALESCE(p_first_name, users.first_name),
@@ -37,10 +33,7 @@ BEGIN
         email        = COALESCE(p_email,      users.email),
         tel_number   = COALESCE(p_tel_number, users.tel_number),
         city_id      = COALESCE(p_city_id,    users.city_id),
-        password_hash = CASE
-            WHEN p_password IS NULL THEN users.password_hash
-            ELSE crypto.crypt(p_password, crypto.gen_salt('bf', 12))
-        END
+        password_hash = COALESCE(p_password,    users.password_hash)
     WHERE users.id = user_id;
 
     IF (p_password IS NOT NULL) THEN
@@ -225,8 +218,7 @@ BEGIN
     END IF;
 
     UPDATE private.orders
-    SET status = 'canceled',
-        changed_at = NOW()
+    SET status = 'canceled'
     WHERE id = p_order_id
       AND client_id = user_id;
 
@@ -289,5 +281,23 @@ BEGIN
 
     RETURN QUERY
         SELECT * FROM admin.clients_stat_view AS clients WHERE clients.id = user_id;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION authorized.add_funds(
+    p_amount NUMERIC
+)
+    RETURNS VOID SECURITY DEFINER AS $$
+DECLARE
+    user_id BIGINT := public.get_current_user_from_session();
+BEGIN
+    IF user_id IS NULL THEN
+        RAISE EXCEPTION 'User not found';
+    END IF;
+
+    INSERT INTO private.transactions AS transactions
+        (user_id, balance_type, transaction_type, payment_method, amount)
+    VALUES
+        (user_id, 'payment', 'debit', 'credit_card', p_amount);
 END;
 $$ LANGUAGE plpgsql;
