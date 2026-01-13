@@ -79,15 +79,41 @@ BEGIN
     END IF;
 
     FOREACH ad IN ARRAY p_addresses LOOP
-        real_address := (SELECT EXISTS(
-            SELECT 1 FROM private.cities AS cities
-            JOIN private.countries AS countries ON cities.country_id = countries.id
-            WHERE cities.name = ad.city AND countries.full_name = ad.country
-        ));
-        IF NOT real_address THEN
-            RAISE EXCEPTION 'Invalid address';
-        END IF;
-    END LOOP;
+
+            IF ad IS NULL THEN
+                RAISE EXCEPTION 'Address cannot be NULL';
+            END IF;
+
+            IF ad.city IS NULL OR trim(ad.city) = '' THEN
+                RAISE EXCEPTION 'City cannot be empty';
+            END IF;
+
+            IF ad.country IS NULL OR trim(ad.country) = '' THEN
+                RAISE EXCEPTION 'Country cannot be empty';
+            END IF;
+
+            IF ad.street IS NULL OR trim(ad.street) = '' THEN
+                RAISE EXCEPTION 'Street cannot be empty';
+            END IF;
+
+            IF ad.house IS NULL OR trim(ad.house) = '' THEN
+                RAISE EXCEPTION 'House cannot be empty';
+            END IF;
+
+            SELECT EXISTS (
+                SELECT 1
+                FROM private.cities c
+                         JOIN private.countries co ON co.id = c.country_id
+                WHERE c.name = ad.city
+                  AND co.full_name = ad.country
+            )
+            INTO real_address;
+
+            IF NOT real_address THEN
+                RAISE EXCEPTION 'Invalid address: %, %', ad.city, ad.country;
+            END IF;
+
+        END LOOP;
 
     INSERT INTO private.transactions(user_id, balance_type, transaction_type, payment_method)
     VALUES (user_id, 'payment', 'credit', p_payment_method)
