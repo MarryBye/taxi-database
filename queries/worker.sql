@@ -113,11 +113,18 @@ SECURITY DEFINER
 SET search_path = private, admin, workers, public
 AS $$
 DECLARE
+    has_current_order BOOLEAN := (SELECT EXISTS(
+        SELECT 1 FROM workers.current_order()
+    ));
     user_id BIGINT := public.get_current_user_from_session();
     v_user_car_class public.car_classes;
 BEGIN
     IF user_id IS NULL THEN
         RAISE EXCEPTION 'User not found';
+    END IF;
+
+    IF has_current_order THEN
+        RAISE EXCEPTION 'You already have an active order';
     END IF;
 
     SELECT cars.car_class

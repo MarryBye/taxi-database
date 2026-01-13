@@ -178,7 +178,7 @@ BEGIN
 
     IF current_status IN ('completed', 'canceled', 'waiting_for_marks') THEN
         RAISE EXCEPTION
-            'Це замовлення не можна скасувати!';
+            'Це замовлення не можна скасувати! Статус: %', current_status;
     END IF;
 
     RETURN NEW;

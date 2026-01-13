@@ -47,6 +47,7 @@ $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION authorized.make_order(
     p_order_class public.car_classes,
+    p_amount NUMERIC,
     p_payment_method public.payment_methods,
     p_addresses address[]
 ) RETURNS SETOF admin.orders_view SECURITY DEFINER AS $$
@@ -115,8 +116,8 @@ BEGIN
 
         END LOOP;
 
-    INSERT INTO private.transactions(user_id, balance_type, transaction_type, payment_method)
-    VALUES (user_id, 'payment', 'credit', p_payment_method)
+    INSERT INTO private.transactions(user_id, balance_type, transaction_type, payment_method, amount)
+    VALUES (user_id, 'payment', 'credit', p_payment_method, p_amount)
     RETURNING id INTO transaction_id;
 
     INSERT INTO private.orders(client_id, transaction_id, status, order_class)
@@ -243,13 +244,13 @@ BEGIN
         RAISE EXCEPTION 'Invalid number of tags';
     END IF;
 
+    INSERT INTO private.order_cancels(order_id, canceled_by, comment)
+    VALUES (p_order_id, user_id, p_comment);
+
     UPDATE private.orders
     SET status = 'canceled'
     WHERE id = p_order_id
       AND client_id = user_id;
-
-    INSERT INTO private.order_cancels(order_id, canceled_by, comment)
-    VALUES (p_order_id, user_id, p_comment);
 
     FOREACH tag IN ARRAY p_tags LOOP
         INSERT INTO private.order_driver_tags(order_id, tag) VALUES (p_order_id, tag);
