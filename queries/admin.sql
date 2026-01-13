@@ -235,7 +235,7 @@ BEGIN
         color        = COALESCE(p_color, color),
         car_class    = COALESCE(p_car_class, car_class),
         car_status   = COALESCE(p_car_status, car_status),
-        driver_id    = COALESCE(p_driver_id, driver_id)
+        driver_id    = p_driver_id
     WHERE id = p_car_id;
 
     RETURN QUERY

@@ -99,8 +99,8 @@ BEGIN
 
         UPDATE private.cars
         SET car_status = CASE
-             WHEN has_driver THEN 'busy'
-             ELSE 'available'
+             WHEN has_driver THEN 'busy'::car_statuses
+             ELSE 'available'::car_statuses
         END
         WHERE id = NEW.car_id;
     END IF;

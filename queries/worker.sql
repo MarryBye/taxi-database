@@ -26,6 +26,7 @@ AS $$
 DECLARE
     v_user_id BIGINT := public.get_current_user_from_session();
     v_city_id BIGINT;
+    v_user_car_class public.car_classes;
 BEGIN
     IF v_user_id IS NULL THEN
         RAISE EXCEPTION 'User not found';
@@ -40,12 +41,18 @@ BEGIN
         RAISE EXCEPTION 'Driver city not found';
     END IF;
 
+    SELECT c.car_class
+    INTO v_user_car_class
+    FROM private.cars AS c
+    WHERE c.driver_id = v_user_id;
+
     RETURN QUERY
         SELECT o.*
         FROM admin.orders_view o
         WHERE
             o.driver IS NULL
           AND o.status = 'searching_for_driver'
+          AND o.order_class = v_user_car_class
           AND (o.client->'city'->>'id')::BIGINT = v_city_id;
 END;
 $$ LANGUAGE plpgsql;
@@ -107,9 +114,19 @@ SET search_path = private, admin, workers, public
 AS $$
 DECLARE
     user_id BIGINT := public.get_current_user_from_session();
+    v_user_car_class public.car_classes;
 BEGIN
     IF user_id IS NULL THEN
         RAISE EXCEPTION 'User not found';
+    END IF;
+
+    SELECT cars.car_class
+    INTO v_user_car_class
+    FROM private.cars AS cars
+    WHERE cars.driver_id = user_id;
+
+    IF v_user_car_class IS NULL THEN
+        RAISE EXCEPTION 'No car!';
     END IF;
 
     UPDATE private.orders AS o
@@ -120,6 +137,7 @@ BEGIN
     WHERE
         o.id = p_order_id
         AND o.driver_id IS NULL
+        AND o.order_class = v_user_car_class
         AND o.status = 'searching_for_driver';
 
     IF NOT FOUND THEN
